@@ -1945,8 +1945,7 @@ function renderCompleteScreen() {
       <div class="final-confetti-layer" aria-hidden="true">${confetti}</div>
       <div class="activity-panel">
         <header class="mobile-mission-banner mobile-mission-banner--compact ft-complete-banner">
-          <img class="ft-banner-glass" src="./assets/images/M_glass.png" alt="" aria-hidden="true" />
-          <div><strong>Fear Trigger Hunt Complete</strong></div>
+          <div><strong>Great Job, <span class="ft-complete-banner-name">Avi</span>!</strong></div>
         </header>
         <div class="mobile-screen-progress">
           <strong>Screen ${total}/${total}</strong>
@@ -1956,10 +1955,10 @@ function renderCompleteScreen() {
         </div>
         <div class="classify-grid classify-grid-empty">
           <div class="ft-complete">
-            <img class="ft-complete-badge" src="./assets/images/final badge.webp" alt="" aria-hidden="true" />
+            <img class="ft-complete-badge" src="./assets/images/sorting-final-icons/mission-shield.webp" alt="" aria-hidden="true" />
             <div class="ft-complete-learned">
               <div class="ft-complete-banner-heading">
-                <strong>HERE'S WHAT AVI LEARNED:</strong>
+                <strong>HERE'S WHAT YOU LEARNED:</strong>
               </div>
               <div class="ft-complete-grid">
                 <div class="ft-learned-card">
@@ -2329,7 +2328,7 @@ function renderGame() {
       </aside>
       <main class="final-board">
         <header class="final-heading">
-          <h3><svg viewBox="0 0 24 24" width="40" height="40" style="display: inline-block; margin-right: 10px;"><circle cx="10" cy="10" r="6" stroke="currentColor" stroke-width="2" fill="none"/><line x1="14" y1="14" x2="20" y2="20" stroke="currentColor" stroke-width="2"/></svg><span>Fear Trigger</span> <em>Hunt Complete</em></h3>
+          <h3><span>Great Job,</span> <em class="final-heading-name">Avi</em>!</h3>
           <p>You found the pressure words and fake-link clues that phishing messages use to rush people.</p>
         </header>
         <div class="final-hero-row">

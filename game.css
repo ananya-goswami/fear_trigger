@@ -1154,7 +1154,7 @@
      phone screen. 0.6 = 60% (fits with margin). Lower = smaller, higher = wider.
      Put on `transform` (not the `scale:` knob above) so it composes with the
      breathe pulse instead of being overridden by it. */
-  transform: translate(-33px, 45px) scale(0.59);
+  transform: translate(-33px, 45px) scale(0.58);
   /* Scale grows around the card's centre (not the canvas centre) so the breathe
      pulse below stays in place instead of drifting. */
   transform-origin: 50% 42%;
@@ -4984,7 +4984,7 @@ body:has(.final-mission-stage) .interaction-host-area {
   font-size: clamp(2.5rem, 5.1vw, 5rem);
   letter-spacing: 0.025em;
   line-height: 0.96;
-  text-transform: uppercase;
+  text-transform: none;
 }
 
 .final-heading h3 span,
@@ -4996,6 +4996,11 @@ body:has(.final-mission-stage) .interaction-host-area {
   color: #9b5cf6;
   color: oklch(64% 0.2 300);
   font-style: normal;
+}
+
+.final-heading h3 .final-heading-name {
+  color: #d4900a;
+  text-shadow: 0 1px 1px rgba(90, 55, 0, 0.35);
 }
 
 .final-heading p {
@@ -5388,9 +5393,9 @@ body:has(.ft-complete) .ft-complete-banner {
   left: auto !important;
   right: auto !important;
   width: fit-content !important;
-  min-width: min(550px, 55vw) !important;
+  min-width: min(520px, 52vw) !important;
   max-width: min(800px, 80vw) !important;
-  padding-left: clamp(120px, 10vw, 160px) !important;
+  padding-left: clamp(30px, 3.8vw, 52px) !important;
   padding-right: clamp(30px, 3.8vw, 52px) !important;
   overflow: visible !important;
   display: flex !important;
@@ -5403,12 +5408,24 @@ body:has(.ft-complete) .ft-complete-banner {
 }
 
 body:has(.ft-complete) .ft-complete-banner strong {
-  font-size: clamp(32px, 4.2vw, 52px) !important;
+  font-size: clamp(40px, 5.2vw, 64px) !important;
   letter-spacing: 0.03em !important;
   color: #1e3a8a !important;
   font-family: 'Lilita One', sans-serif !important;
-  text-transform: uppercase !important;
+  text-transform: none !important;
   line-height: 1.2 !important;
+}
+
+body:has(.ft-complete) .ft-complete-banner-name {
+  /* Shiny gold gradient (light top -> rich bottom) + dark drop-shadow for
+     readability on the light sky. */
+  background: linear-gradient(180deg, #ffe08a 0%, #f5ad1a 52%, #e08a00 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: #eca216;
+  filter: drop-shadow(0 2px 1px rgba(110, 70, 0, 0.45));
+  font-family: inherit;
 }
 
 body:has(.ft-complete) .mobile-screen-progress {
@@ -5416,6 +5433,7 @@ body:has(.ft-complete) .mobile-screen-progress {
 }
 
 .ft-banner-glass {
+  display: none;
   position: absolute;
   left: clamp(55px, 2vw, 60px);
   top: clamp(-20px, -2vh, 0px);
@@ -5428,33 +5446,48 @@ body:has(.ft-complete) .mobile-screen-progress {
 }
 
 body:has(.ft-complete) .classify-grid.classify-grid-empty {
-  width: min(820px, 62vw);
-  margin-top: clamp(-10px, -1.1vh, 0px);
+  position: relative;
+  width: min(900px, 70vw);
+  min-height: clamp(430px, 68vh, 600px);
+  margin-top: 0;
 }
 
 body:has(.ft-complete) .ft-complete {
   position: relative;
   width: 100%;
+  height: 100%;
+  min-height: inherit;
   max-width: none;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: clamp(-700px, -50vh, -460px);
+  display: block;
   padding: 0;
 }
 
 .ft-complete-badge {
-  display: none;
+  display: block;
+  position: absolute;
+  top: clamp(-10px, 1vh, 14px);
+  left: 50%;
+  transform: translateX(calc(-50% + 70px));
+  z-index: 2;
+  width: clamp(90px, 10vw, 140px);
+  height: auto;
+  object-fit: contain;
 }
 
 .ft-complete-learned {
-  width: min(650px, 80vw);
+  position: absolute;
+  right: 0;
+  bottom: clamp(20px, 0.25vh, 10px);
+  z-index: 2;
+  width: min(1100px, calc(100% - clamp(20px, 3vw, 40px)));
   padding: clamp(24px, 3.2vh, 36px) clamp(32px, 3.5vw, 48px);
   border: 2px solid rgba(197, 213, 245, 0.9);
   border-radius: 28px;
+  transform: scale(0.85);
+  transform-origin: bottom right;
   background: rgba(230, 210, 250, 0.95);
   box-shadow: 0 8px 0 rgba(64, 91, 168, 0.12), 0 18px 34px rgba(44, 65, 138, 0.12);
-  margin-left: clamp(150px, 18vw, 280px);
+  margin-left: 0;
 }
 
 body:has(.ft-complete) .ft-complete-lead {
@@ -5592,12 +5625,16 @@ body:has(.ft-complete) .ft-complete-grid {
 }
 
 .ft-complete-character {
-  max-width: clamp(240px, 28vw, 420px);
+  position: absolute;
+  /* Placed in the empty space ABOVE the learned box (upper-left). */
+  left: clamp(50px, 12vw, 160px);
+  top: clamp(-40px, -7vh, -100px);
+  /* Behind the learned box (box is z-index: 2). */
+  z-index: 1;
+  max-width: clamp(150px, 17vw, 250px);
   height: auto;
   object-fit: contain;
-  margin-top: clamp(-200px, -32vh, -220px);
-  margin-left: clamp(-45px, -6vw, -40px);
-  z-index: 1;
+  margin: 0;
 }
 
 body:has(.ft-complete) .check-btn-wrap.fear-complete-actions {

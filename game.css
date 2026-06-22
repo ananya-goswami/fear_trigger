@@ -4993,7 +4993,8 @@ body:has(.final-mission-stage) .interaction-host-area {
 }
 
 .final-heading h3 em {
-  color: #ef5266;
+  color: #9b5cf6;
+  color: oklch(64% 0.2 300);
   font-style: normal;
 }
 

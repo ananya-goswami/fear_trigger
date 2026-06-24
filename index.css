@@ -926,20 +926,77 @@ button {
 
   .left-panel {
     flex: 0 0 auto;
+    max-height: 38dvh;
+  }
+
+  .right-panel {
+    flex: 1 1 auto;
   }
 
   .status-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
+  /* The full-bleed game stages (sort / classify / final-mission / completion)
+     are single-screen landscape layouts whose play boards are positioned
+     absolutely. Stacking the sidebar on top would crop them, so keep them as a
+     row and let their own clamp(vw/vh) sizing scale them down. */
+  body:has(.sort-stage) .content,
+  body:has(.sort-final-stage) .content,
+  body:has(.classify-grid) .content,
+  body:has(.final-mission-stage) .content {
+    flex-direction: row;
+  }
+
+  body:has(.sort-stage) .left-panel,
+  body:has(.sort-final-stage) .left-panel,
+  body:has(.classify-grid) .left-panel,
+  body:has(.final-mission-stage) .left-panel {
+    max-height: none;
+  }
 }
 
 @media (max-width: 760px) {
+  /* On small screens the standard (non-full-bleed) shell may grow taller than
+     the viewport once the layout stacks. Let it scroll instead of clipping the
+     content. The full-bleed game stages keep their fixed single-screen layout
+     (portrait is blocked, so they only ever render in landscape). */
+  html:not(:has(.sort-stage, .sort-final-stage, .classify-grid, .final-mission-stage)),
+  body:not(:has(.sort-stage, .sort-final-stage, .classify-grid, .final-mission-stage)) {
+    height: auto;
+    overflow-y: auto;
+  }
+
+  body:not(:has(.sort-stage, .sort-final-stage, .classify-grid, .final-mission-stage)) .app-container {
+    height: auto;
+    min-height: 100dvh;
+  }
+
+  body:not(:has(.sort-stage, .sort-final-stage, .classify-grid, .final-mission-stage)) .left-panel {
+    max-height: none;
+    overflow: visible;
+  }
+
+  body:not(:has(.sort-stage, .sort-final-stage, .classify-grid, .final-mission-stage)) .right-panel {
+    min-height: clamp(420px, 68dvh, 560px);
+  }
+
   .top-bar {
     flex-wrap: wrap;
   }
 
   .top-icons {
     gap: 10px;
+  }
+
+  .icon-circle {
+    width: 44px;
+    height: 44px;
+  }
+
+  .icon-circle svg {
+    width: 24px;
+    height: 24px;
   }
 
   .status-grid {

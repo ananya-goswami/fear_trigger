@@ -79,6 +79,10 @@ const state = {
   mythIndex: 0,
   mythAnswers: {},
   completeAudioPlayed: false,
+  // Fear-triggers result for the complete screen: how many of the message's fear
+  // triggers the learner correctly boxed (set in checkSelection, read in
+  // renderCompleteScreen). Was previously a hardcoded perfect score.
+  triggerScore: null,
   answerEffectKey: '',
   feedback: '',
   feedbackKind: '',
@@ -833,6 +837,7 @@ function restartGame() {
   state.points = 0;
   state.scoredKeys = new Set();
   state.completeAudioPlayed = false;
+  state.triggerScore = null;
   resetActivityState();
   updateGameWithCircles();
   renderGame();
@@ -1891,6 +1896,16 @@ function checkSelection() {
   const noExtras = selectedIds.every((id) => TRIGGER_IDS.includes(id));
   const correct = selectedIds.length > 0 && allTriggers && noExtras;
 
+  // Record the real score for the complete screen: count the fear triggers the
+  // learner correctly boxed, minus any safe words boxed by mistake (so boxing
+  // every word can't fake a perfect score). Clamped to 0..total.
+  const triggersBoxed = selectedIds.filter((id) => TRIGGER_IDS.includes(id)).length;
+  const extrasBoxed = selectedIds.length - triggersBoxed;
+  state.triggerScore = {
+    correct: Math.max(0, triggersBoxed - extrasBoxed),
+    total: TRIGGER_IDS.length
+  };
+
   words.forEach((word) => {
     const isTrigger = TRIGGER_IDS.includes(word.dataset.id);
     const isSelected = word.classList.contains('selected');
@@ -1980,9 +1995,10 @@ function showNextClue() {
 
 // Fear-triggers End screen — completion summary. No phone; celebratory Avi.
 function renderCompleteScreen() {
-  const activity = getCurrentActivity();
   state.step = 3; // Progress phase 3/3 ("Learn it": explain + complete)
-  const total = activity.progressTotal || 3;
+  // Real fear-trigger score (set when the learner pressed Check). Default to a
+  // zero score if somehow reached without grading, so we never fake a result.
+  const score = state.triggerScore || { correct: 0, total: TRIGGER_IDS.length };
   const confetti = Array.from({ length: 70 }, (_, index) => `
     <i class="final-confetti ${index % 8 === 0 ? 'confetti-star' : ''}" aria-hidden="true"
        style="--x:${(index * 29) % 98}%; --delay:${(index % 9) * -0.38}s; --dur:${3.3 + (index % 6) * 0.34}s; --spin:${80 + (index % 7) * 54}deg;"></i>
@@ -2008,8 +2024,8 @@ function renderCompleteScreen() {
         <section class="final-found-card">
           <img class="final-target-icon" src="./assets/images/sorting-final-icons/target.webp" alt="" aria-hidden="true">
           <div>
-            <strong>Screens Correct</strong>
-            <b>${total} / ${total}</b>
+            <strong>Clues Found</strong>
+            <b>${score.correct} / ${score.total}</b>
             <span>Great work!</span>
           </div>
         </section>

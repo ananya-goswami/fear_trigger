@@ -388,7 +388,7 @@
   color: #25304a;
   border-radius: 4px 14px 14px 14px;
   padding: 12px;
-  font-size: clamp(0.82rem, 1.4vw, 1rem);
+  font-size: clamp(0.875rem, 1.4vw, 1rem);
   font-weight: 800;
   line-height: 1.45;
 }
@@ -534,7 +534,7 @@
 
 .dialogue-bubble p {
   color: var(--text-secondary);
-  font-size: clamp(0.84rem, 1.32vw, 0.98rem);
+  font-size: clamp(0.875rem, 1.32vw, 0.98rem);
   font-weight: 700;
   line-height: 1.34;
 }
@@ -674,7 +674,7 @@
   border: 2px solid #fed7aa;
   border-radius: 10px;
   color: var(--text-secondary);
-  font-size: clamp(0.78rem, 1.35vw, 0.9rem);
+  font-size: clamp(0.875rem, 1.35vw, 0.9rem);
   font-weight: 800;
   line-height: 1.25;
 }
@@ -709,7 +709,7 @@
 
 .quiz-question-title {
   color: var(--brand-secondary);
-  font-size: clamp(0.86rem, 1.35vw, 0.94rem);
+  font-size: clamp(0.875rem, 1.35vw, 0.94rem);
   font-weight: 1000;
   line-height: 1.22;
 }
@@ -724,7 +724,7 @@
 .quiz-question-card .answer-option {
   min-height: 0;
   padding: 8px 10px;
-  font-size: clamp(0.78rem, 1.25vw, 0.94rem);
+  font-size: clamp(0.875rem, 1.25vw, 0.94rem);
   line-height: 1.2;
 }
 
@@ -745,7 +745,7 @@
 .myth-fact-card p {
   padding: 8px 10px;
   color: var(--text-secondary);
-  font-size: 0.78rem;
+  font-size: 0.875rem;
   font-weight: 800;
   line-height: 1.3;
 }
@@ -811,7 +811,7 @@
 .myth-fact-reveal p {
   padding: 10px 12px;
   color: var(--text-secondary);
-  font-size: clamp(0.86rem, 1.35vw, 1rem);
+  font-size: clamp(0.875rem, 1.35vw, 1rem);
   font-weight: 850;
   line-height: 1.35;
 }
@@ -997,7 +997,7 @@
   border-radius: 10px;
   cursor: pointer;
   text-align: left;
-  font-size: clamp(0.82rem, 1.2vw, 0.94rem);
+  font-size: clamp(0.875rem, 1.2vw, 0.94rem);
   font-weight: 800;
   line-height: 1.3;
 }
@@ -1010,7 +1010,7 @@
 .final-activity-stage .quiz-question-card .answer-option {
   min-height: 0;
   padding: 8px 10px;
-  font-size: clamp(0.78rem, 1.25vw, 0.94rem);
+  font-size: clamp(0.875rem, 1.25vw, 0.94rem);
   line-height: 1.2;
 }
 
@@ -2846,7 +2846,7 @@ body:has(.sort-stage) .answer-card {
   border-radius: 22px;
   background: #fff;
   color: #17246e;
-  font-size: clamp(0.84rem, 1.08vw, 1.08rem);
+  font-size: clamp(0.875rem, 1.08vw, 1.08rem);
   font-weight: 800;
   line-height: 1.38;
   text-align: center;
@@ -2872,6 +2872,35 @@ body:has(.sort-stage) .answer-card {
 .tej-speech em {
   color: #e8326d;
   font-style: normal;
+}
+
+/* Golden "click anywhere to activate voice" prompt bubble + pop effect,
+   copied from the bubble-burst game's .zara-speech.is-voice-prompt. */
+.tej-speech.is-voice-prompt {
+  background: linear-gradient(180deg, #fff8d6 0%, #ffe58a 100%);
+  border: 2px solid #f2b91f;
+  color: #6d4900;
+  box-shadow: 0 0 0 0 rgba(242, 185, 31, 0.4), 0 14px 28px rgba(191, 128, 0, 0.24);
+  animation: voice-prompt-pulse 1.6s ease-in-out infinite;
+}
+
+.tej-speech.is-voice-prompt::after {
+  border-top-color: #ffe58a;
+}
+
+.tej-speech.is-voice-prompt em {
+  color: #b56a00;
+}
+
+@keyframes voice-prompt-pulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(242, 185, 31, 0.18), 0 14px 28px rgba(191, 128, 0, 0.18);
+  }
+  50% {
+    transform: scale(1.045);
+    box-shadow: 0 0 28px 10px rgba(255, 208, 63, 0.45), 0 18px 34px rgba(191, 128, 0, 0.3);
+  }
 }
 
 body:has(.sort-stage) #coachCard {
@@ -2931,7 +2960,7 @@ body:has(.sort-stage) .section-eyebrow::before {
   border-radius: 20px;
   background: #fff;
   color: #212464;
-  font-size: clamp(0.82rem, 1.12vw, 1.08rem);
+  font-size: clamp(0.875rem, 1.12vw, 1.08rem);
   font-weight: 800;
   text-align: center;
 }
@@ -3192,7 +3221,7 @@ body:has(.sort-stage) .safe-zone > strong { background: #35a52f; }
   bottom: 18px;
   left: 8px;
   color: #ef4444;
-  font-size: clamp(0.72rem, 1vw, 0.98rem);
+  font-size: clamp(0.875rem, 1vw, 0.98rem);
   font-weight: 800;
   text-align: center;
 }
@@ -3846,7 +3875,7 @@ body:has(.classify-grid) .tej-speech {
   width: 62%;
   padding: 12px 9px;
   border-radius: 22px;
-  font-size: clamp(0.78rem, 0.95vw, 0.98rem);
+  font-size: clamp(0.875rem, 0.95vw, 0.98rem);
 }
 
 body:has(.classify-grid) #coachCard {
@@ -4852,7 +4881,7 @@ body:has(.final-mission-stage) .interaction-host-area {
 .final-side-mission-card span {
   margin-top: 6px;
   color: #253d80;
-  font-size: clamp(0.78rem, 1.05vw, 1rem);
+  font-size: clamp(0.875rem, 1.05vw, 1rem);
   font-weight: 1000;
 }
 
@@ -5108,7 +5137,7 @@ body:has(.final-mission-stage) .interaction-host-area {
 
 .final-clue-card strong {
   font-family: 'Lilita One', sans-serif;
-  font-size: clamp(0.86rem, 1.35vw, 1.2rem);
+  font-size: clamp(0.875rem, 1.35vw, 1.2rem);
   line-height: 1;
   text-transform: uppercase;
 }
@@ -5117,14 +5146,14 @@ body:has(.final-mission-stage) .interaction-host-area {
   margin-top: 8px;
   color: #f0174a;
   font-style: normal;
-  font-size: clamp(0.72rem, 1.05vw, 0.98rem);
+  font-size: clamp(0.875rem, 1.05vw, 0.98rem);
   font-weight: 1000;
 }
 
 .final-clue-card span {
   max-width: 260px;
   margin: 10px auto 0;
-  font-size: clamp(0.68rem, 0.98vw, 0.94rem);
+  font-size: clamp(0.875rem, 0.98vw, 0.94rem);
   font-weight: 800;
   line-height: 1.22;
 }
@@ -5145,7 +5174,7 @@ body:has(.final-mission-stage) .interaction-host-area {
 .final-report-section .report-heading {
   margin: 0 0 6px 0;
   color: #203b82;
-  font-size: clamp(0.85rem, 1.1vw, 1rem);
+  font-size: clamp(0.875rem, 1.1vw, 1rem);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -5154,7 +5183,7 @@ body:has(.final-mission-stage) .interaction-host-area {
 .final-report-section .report-details {
   margin: 0;
   color: #253d80;
-  font-size: clamp(0.8rem, 1vw, 0.95rem);
+  font-size: clamp(0.875rem, 1vw, 0.95rem);
   font-weight: 600;
   line-height: 1.3;
 }
@@ -5574,7 +5603,7 @@ body:has(.ft-complete) .ft-complete-note {
 
 .ft-learned-card small {
   color: #475569;
-  font-size: clamp(11px, 1.35vh, 13px);
+  font-size: clamp(12px, 1.35vh, 13px);
   font-weight: 600;
   line-height: 1.3;
 }
@@ -5978,7 +6007,7 @@ body:has(.ft-complete) .final-activity-sidebar .final-found-card div {
 body:has(.ft-complete) .final-activity-sidebar .final-found-card strong,
 body:has(.ft-complete) .final-activity-sidebar .final-found-card span {
   color: #14296b;
-  font-size: clamp(0.86rem, 1.1vw, 1.05rem);
+  font-size: clamp(0.875rem, 1.1vw, 1.05rem);
   font-weight: 1000;
   line-height: 1.1;
   text-transform: uppercase;
@@ -6041,4 +6070,133 @@ body:has(.classify-grid-empty) .check-btn-wrap.fear-complete-actions .btn {
   border: none !important;
   background: #5548c9 !important;
   box-shadow: inset 0 -4px 0 rgba(0, 0, 0, 0.15), 0 4px 8px rgba(85, 72, 201, 0.3) !important;
+}
+
+/* ============================================================
+   RESPONSIVE BREAKPOINTS — mirrors the Activity 4 reference
+   (1100 / 900 / 760 / 480). The shell is already fluid via
+   clamp(vw/vh); these queries reflow the in-flow stage grids on
+   smaller landscape screens so cards keep a comfortable width once
+   the play area drops below the sidebar. Portrait is handled by the
+   portrait-mode-blocker (index.css). No font-size is set below the
+   floors here: ~13px captions stay >= 12px, all other readable text
+   stays >= 14px.
+   ============================================================ */
+
+@media (max-width: 760px) {
+  /* Multi-column content grids in the standard shell collapse toward a single
+     readable column. */
+  .cast-row,
+  .warning-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .myth-fact-grid,
+  .answer-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Bubble-burst arena: keep a usable play height and shrink the bubbles so they
+     don't crowd the narrower arena. */
+  .bubble-arena {
+    min-height: 300px;
+  }
+
+  .burst-bubble {
+    width: clamp(78px, 20vw, 112px);
+    height: clamp(78px, 20vw, 112px);
+  }
+
+  .burst-bubble.long-bubble {
+    width: clamp(104px, 26vw, 138px);
+    height: clamp(104px, 26vw, 138px);
+  }
+
+  .swipe-deck {
+    min-height: 280px;
+  }
+
+  /* Match board: the connector lines are positioned by coordinates and can't
+     follow a stacked layout, so drop the arrow/line column and stack the two
+     sign columns (pairing still reads via the node colours/state). */
+  .match-board {
+    grid-template-columns: 1fr;
+  }
+
+  .match-lines {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .cast-row,
+  .warning-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .myth-choice-row,
+  .myth-actions,
+  .bubble-info-row,
+  .sort-info-row {
+    grid-template-columns: 1fr;
+  }
+
+  .burst-bubble {
+    width: clamp(74px, 26vw, 104px);
+    height: clamp(74px, 26vw, 104px);
+  }
+
+  .burst-bubble.long-bubble {
+    width: clamp(96px, 32vw, 128px);
+    height: clamp(96px, 32vw, 128px);
+  }
+}
+
+/* ============================================================================
+   FINALE BACKGROUND — keep the game's purple-winter scene (sorting-background.webp)
+   across the whole Mission Complete screen instead of the blue takeover. The
+   Activity 4 layout (side panel + board, pill ribbon, clue cards) is preserved;
+   only the backdrop is swapped so it matches the rest of the game.
+   ============================================================================ */
+body:has(.final-mission-stage),
+body:has(.final-mission-stage) .app-container {
+  background: url('./assets/images/sorting-background.webp') center / cover no-repeat;
+}
+
+.final-mission-stage {
+  background: transparent;
+  border: 0;
+}
+
+body:has(.final-mission-stage) .right-panel,
+body:has(.final-mission-stage) .interaction-host-area,
+body:has(.final-mission-stage) .final-board {
+  background: transparent;
+}
+
+body:has(.final-mission-stage) .final-board::after {
+  display: none;
+}
+
+/* Restore a distinct left sidebar panel (the transparent backdrop above removed
+   its frame). Lavender panel, like Activity 4, holding the white cards + motto. */
+body:has(.final-mission-stage) .final-side-panel {
+  background: linear-gradient(180deg, #b8abf6, #aa9bf2);
+  border-radius: 18px;
+  padding: clamp(12px, 1.6vw, 18px) clamp(10px, 1vw, 14px);
+}
+
+/* Cyber-fraud note now sits inside the "What you learned" panel (Activity 4 has
+   no separate bottom report row), which clears the Play Again button overlap. */
+.final-spotted-note {
+  margin: clamp(10px, 1.4vh, 14px) 14px 0;
+  color: #2b2150;
+  font-size: clamp(0.8rem, 0.95vw, 0.92rem);
+  font-weight: 800;
+  line-height: 1.25;
+  text-align: center;
+}
+
+.final-spotted-note strong {
+  color: #5b3fb8;
 }

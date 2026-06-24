@@ -54,6 +54,7 @@ const state = {
   speaking: false,
   // Start UNMUTED: voiceover plays by default.
   muted: false,
+  voiceActivated: false,
   toastTimer: null,
   selected: new Set(),
   bubbleLayout: {},
@@ -325,6 +326,10 @@ function setIntroChoiceHighlight(which) {
 }
 
 function playFirstPageInstruction() {
+  // Hold the first-screen voiceover until the user clicks the yellow voice-prompt
+  // bubble (matches the bubble-burst). The click-to-activate handler then plays it
+  // via playScreenVoice once state.voiceActivated is set.
+  if (isFirstActivityScreen() && !state.voiceActivated) return;
   pendingFirstPageInstruction = false;
   sfx.firstPageInstruction.pause();
   sfx.firstPageInstruction.currentTime = 0;
@@ -391,6 +396,33 @@ function playScreenVoice(path, onEnded, fallbackMs) {
   screenVoice.playbackRate = 1;
   if (currentVoiceOnEnded) screenVoice.onended = currentVoiceOnEnded;
   screenVoice.play().catch(() => {});
+}
+
+// First-screen voice prompt (behavior ported from the bubble-burst game): the
+// mascot's first bubble invites a click to start the voiceover, since browsers
+// block autoplay until the first user gesture.
+const VOICE_PROMPT_HTML = 'Click anywhere on the page <em>except the bubbles</em> to activate voice.';
+const VOICE_ACTIVATION_IGNORED = '#muteBtn, #resetGameBtn, #fullscreenBtn, #langBtn, #languagePopupOverlay';
+let voiceActivationHandler = null;
+
+function clearVoiceActivation() {
+  if (!voiceActivationHandler) return;
+  document.removeEventListener('pointerdown', voiceActivationHandler);
+  document.removeEventListener('touchstart', voiceActivationHandler);
+  voiceActivationHandler = null;
+}
+
+// Arm a one-time "click anywhere (except the controls) to start the voiceover".
+function armVoiceActivation(onActivate) {
+  if (voiceActivationHandler) return;
+  voiceActivationHandler = (event) => {
+    if (event?.target?.closest?.(VOICE_ACTIVATION_IGNORED)) return;
+    clearVoiceActivation();
+    state.voiceActivated = true;
+    onActivate();
+  };
+  document.addEventListener('pointerdown', voiceActivationHandler);
+  document.addEventListener('touchstart', voiceActivationHandler);
 }
 
 function retryFirstPageInstructionIfNeeded() {
@@ -785,6 +817,8 @@ function goToNextMythFrame() {
 
 function restartGame() {
   cancelVoice();
+  clearVoiceActivation();
+  state.voiceActivated = false;
   sfx.firstPageInstruction.pause();
   sfx.firstPageInstruction.currentTime = 0;
   stopQuizTimer();
@@ -1629,12 +1663,25 @@ function renderInfoPageActivity(activity) {
     introNotification.addEventListener('click', renderInboxScreen);
   }
 
-  // Screen-1 sidebar: Avi's intro pose + intro speech bubble.
-  setGuide(AVI_BY_SCREEN.intro, "This alert looks scary. <strong>Let's find the fear tricks before we trust it!</strong>");
   // Intro has no footer button (advance by tapping the notification).
   setFooterButtons([]);
-  // Screen-1 voiceover (no-op while muted; unmuting plays it).
-  playScreenVoice(`${VOICEOVER_PATH}screen1_phone_notification.ogg`, null);
+  // Screen-1 sidebar: Avi's intro pose. The first bubble shows the click-to-activate
+  // prompt (voiceover waits for a tap, since browsers block autoplay). On the first
+  // click anywhere (except the controls) the bubble is restored to Avi's intro line
+  // and the Screen-1 voiceover plays.
+  const AVI_INTRO_SPEECH = "This alert looks scary. <strong>Let's find the fear tricks before we trust it!</strong>";
+  if (!state.voiceActivated) {
+    setGuide(AVI_BY_SCREEN.intro, VOICE_PROMPT_HTML);
+    document.querySelector('.tej-speech')?.classList.add('is-voice-prompt');
+    armVoiceActivation(() => {
+      document.querySelector('.tej-speech')?.classList.remove('is-voice-prompt');
+      setGuide(AVI_BY_SCREEN.intro, AVI_INTRO_SPEECH);
+      playScreenVoice(`${VOICEOVER_PATH}screen1_phone_notification.ogg`, null);
+    });
+  } else {
+    setGuide(AVI_BY_SCREEN.intro, AVI_INTRO_SPEECH);
+    playScreenVoice(`${VOICEOVER_PATH}screen1_phone_notification.ogg`, null);
+  }
 }
 
 // Fear-triggers Screen 2 — Messages inbox. Same shell + same phone frame as the
@@ -1940,56 +1987,66 @@ function renderCompleteScreen() {
     <i class="final-confetti ${index % 8 === 0 ? 'confetti-star' : ''}" aria-hidden="true"
        style="--x:${(index * 29) % 98}%; --delay:${(index % 9) * -0.38}s; --dur:${3.3 + (index % 6) * 0.34}s; --spin:${80 + (index % 7) * 54}deg;"></i>
   `).join('');
+  // Layout ported from Activity 4 (final-mission-stage). Content is unchanged:
+  // Avi, the three fear-trigger clue cards (with their sprite icons), the 3/3
+  // score and the cyber-fraud note. The .final-mission-stage class triggers the
+  // shared CSS that hides the app chrome and lays out the side panel + board.
+  const learned = [
+    { icon: 'panic', title: 'Panic Words', detail: 'Urgent words create panic' },
+    { icon: 'deadline', title: 'Threats and Deadlines', detail: 'Threats and short deadlines add pressure' },
+    { icon: 'link', title: 'Strange Links', detail: 'Check links before you trust them' }
+  ];
   ui.host.innerHTML = `
-    <section class="scam-game activity-stage">
+    <section class="scam-game final-mission-stage">
       <div class="final-confetti-layer" aria-hidden="true">${confetti}</div>
-      <div class="activity-panel">
-        <header class="mobile-mission-banner mobile-mission-banner--compact ft-complete-banner">
-          <div><strong>Great Job, <span class="ft-complete-banner-name">Avi</span>!</strong></div>
-        </header>
-        <div class="mobile-screen-progress">
-          <strong>Screen ${total}/${total}</strong>
-          <span class="mobile-progress-dots" aria-hidden="true">
-            ${Array.from({ length: total }, () => '<i class="done"></i>').join('')}
-          </span>
-        </div>
-        <div class="classify-grid classify-grid-empty">
-          <div class="ft-complete">
-            <img class="ft-complete-badge" src="./assets/images/sorting-final-icons/mission-shield.webp" alt="" aria-hidden="true" />
-            <div class="ft-complete-learned">
-              <div class="ft-complete-banner-heading">
-                <strong>HERE'S WHAT YOU LEARNED:</strong>
-              </div>
-              <div class="ft-complete-grid">
-                <div class="ft-learned-card">
-                  <div class="ft-learned-icon ft-learned-icon--panic"></div>
-                  <b>Panic Words</b>
-                  <small>Urgent words create panic</small>
-                </div>
-                <div class="ft-learned-card">
-                  <div class="ft-learned-icon ft-learned-icon--deadline"></div>
-                  <b>Threats and Deadlines</b>
-                  <small>Threats and short deadlines add pressure</small>
-                </div>
-                <div class="ft-learned-card">
-                  <div class="ft-learned-icon ft-learned-icon--link"></div>
-                  <b>Strange Links</b>
-                  <small>Check links before you trust them</small>
-                </div>
-              </div>
-            </div>
-            <img class="ft-complete-character" src="./assets/images/avi/avi_end_screen.webp" alt="Avi celebrating">
-            <p class="ft-complete-note">Report Cyber Fraud in India at <b>cybercrime.gov.in</b> or call <b>1930</b>.</p>
+      <aside class="final-side-panel">
+        <section class="final-side-mission-card">
+          <img src="./assets/images/sorting-final-icons/mission-shield.webp" alt="" aria-hidden="true">
+          <strong>Mission<br><em>Complete!</em></strong>
+          <span>You made smart choices online!</span>
+        </section>
+        <section class="final-found-card">
+          <img class="final-target-icon" src="./assets/images/sorting-final-icons/target.webp" alt="" aria-hidden="true">
+          <div>
+            <strong>Screens Correct</strong>
+            <b>${total} / ${total}</b>
+            <span>Great work!</span>
           </div>
+        </section>
+        <div class="sidebar-motto"><span aria-hidden="true"></span> Be <b>Smart.</b> Be <b>Safe.</b> Be <b>Secure.</b></div>
+      </aside>
+      <main class="final-board">
+        <header class="final-heading">
+          <h3><span>Great Job,</span> <em class="final-heading-name">Avi</em>!</h3>
+          <p>You found the pressure words and fake-link clues that phishing messages use to rush people.</p>
+        </header>
+        <div class="final-hero-row">
+          <img class="final-simran" src="./assets/images/avi/avi_end_screen.webp" alt="Avi celebrating">
+          <img class="final-shield" src="./assets/images/final badge.webp" alt="Safety shield badge">
+          <img class="final-scam-trash" src="./assets/images/sorting-final-icons/clipboard.webp" alt="Scam messages stopped">
         </div>
-      </div>
+        <section class="final-spotted-panel">
+          <strong class="final-spotted-ribbon">Here&rsquo;s What You Learned:</strong>
+          <div class="final-spotted-grid">
+            ${learned.map((item) => `
+              <article class="final-clue-card">
+                <div class="ft-learned-icon ft-learned-icon--${item.icon}" aria-hidden="true"></div>
+                <strong>${item.title}</strong>
+                <span>${item.detail}</span>
+              </article>
+            `).join('')}
+          </div>
+          <p class="final-spotted-note">Report Cyber Fraud in India at <strong>cybercrime.gov.in</strong> or call <strong>1930</strong>.</p>
+        </section>
+        <button class="final-play-again" type="button">&#8635; <span>Play Again</span></button>
+      </main>
     </section>
   `;
-  // Update sidebar to show Mission Complete instead of fear-trigger detective
-  setCompleteMissionSidebar();
   playSfx('complete');
-  setFooterButtons([{ label: 'Play Again', onClick: () => renderInfoPageActivity(getCurrentActivity()) }]);
-  document.getElementById('footerButtons')?.classList.add('fear-complete-actions');
+  // App chrome (left panel + footer) is hidden via the .final-mission-stage CSS;
+  // the in-board Play Again button restarts the activity.
+  setFooterButtons([]);
+  ui.host.querySelector('.final-play-again').addEventListener('click', () => renderInfoPageActivity(getCurrentActivity()));
   playScreenVoice(`${VOICEOVER_PATH}screen7_complete.ogg`, null);
 }
 

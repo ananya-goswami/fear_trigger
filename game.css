@@ -70,6 +70,8 @@
 
 .question-label {
   display: none;
+  font-family: 'Lilita One', sans-serif;
+  font-weight: 400;
 }
 
 .safety-heading {
@@ -2796,10 +2798,11 @@ body:has(.sort-stage) .question-label {
   display: block;
   color: #17155a;
   font-family: 'Lilita One', sans-serif;
-  font-size: clamp(1.45rem, 2.25vw, 2.25rem);
+  font-size: clamp(1.55rem, 2.5vw, 2.4rem);
+  line-height: 1.1;
   letter-spacing: 0.02em;
   text-align: center;
-  text-transform: none;
+  text-transform: uppercase;
 }
 
 body:has(.sort-stage) .safety-heading {
@@ -3297,7 +3300,7 @@ body:has(.sort-stage) .check-btn-wrap .btn:disabled {
 }
 
 body:has(.sort-stage) .check-btn-wrap .btn:not(:disabled) {
-  background: #5548c9;
+  background: #8A76E8;
 }
 
 body:has(.sort-stage) .check-btn-wrap .btn::before {
@@ -3835,7 +3838,7 @@ body:has(.classify-grid) .question-label {
   line-height: 1.1;
   letter-spacing: 0.01em;
   text-align: center;
-  text-transform: none;
+  text-transform: uppercase;
   text-shadow: none;
 }
 
@@ -4619,7 +4622,7 @@ body:has(.classify-grid) .footer-buttons .btn {
   padding: 8px 18px;
   border: 1px solid rgba(255, 255, 255, 0.7);
   border-radius: 22px;
-  background: #5548c9;
+  background: #8A76E8;
   color: rgba(255, 255, 255, 0.86);
   font-family: 'Lilita One', sans-serif;
   font-size: clamp(1.1rem, 1.7vw, 1.7rem);
@@ -4632,7 +4635,7 @@ body:has(.classify-grid) .footer-buttons {
 }
 
 body:has(.classify-grid) .footer-buttons .btn:not(:disabled) {
-  background: #5548c9;
+  background: #8A76E8;
   color: rgba(255, 255, 255, 0.92);
 }
 
@@ -4763,9 +4766,9 @@ body:has(.final-mission-stage) .top-icons {
 body:has(.final-mission-stage) .icon-circle {
   width: 56px;
   height: 56px;
-  border: 1px solid #c8b8ff;
-  background: rgba(80, 51, 184, 0.92);
-  color: #fff;
+  border: 1px solid #d7cbff;
+  background: rgba(247, 243, 255, 0.92);
+  color: #495a7a;
   box-shadow: none;
 }
 
@@ -4777,7 +4780,7 @@ body:has(.final-mission-stage) #langBtn {
 body:has(.final-mission-stage) .icon-circle svg {
   width: 32px;
   height: 32px;
-  color: #fff;
+  color: #495a7a;
 }
 
 body:has(.final-mission-stage) .content,
@@ -4852,8 +4855,8 @@ body:has(.final-mission-stage) .interaction-host-area {
   position: relative;
   display: grid;
   justify-items: center;
-  margin-top: 0;
-  padding: clamp(36px, 5.5vh, 50px) 10px 10px;
+  margin-top: 18px;
+  padding: clamp(38px, 6vh, 58px) 10px 12px;
 }
 
 .final-side-mission-card img {
@@ -4873,7 +4876,7 @@ body:has(.final-mission-stage) .interaction-host-area {
 }
 
 .final-side-mission-card em {
-  color: #42a95f;
+  color: #d4900a;
   font-family: inherit;
   font-style: normal;
 }
@@ -4890,8 +4893,7 @@ body:has(.final-mission-stage) .interaction-host-area {
   grid-template-columns: auto 1fr;
   align-items: center;
   gap: 8px;
-  padding: clamp(10px, 1.2vh, 14px) 14px;
-  margin-top: 8px;
+  padding: clamp(8px, 1.4vh, 15px) 14px;
 }
 
 .final-found-card div {
@@ -4968,8 +4970,20 @@ body:has(.final-mission-stage) .interaction-host-area {
   border-radius: 22px;
   background: #fff;
   color: #294384;
+  /* Sized to fit the whole motto on ONE line in the narrow sidebar (image 2). */
+  font-size: clamp(0.62rem, 0.85vw, 0.92rem);
   font-weight: 900;
   text-align: center;
+  white-space: nowrap;
+}
+
+/* Restore the gold star on the end-screen motto (the flat-palette override at
+   .sidebar-motto span removes it). */
+.final-side-panel .sidebar-motto span {
+  background:
+    radial-gradient(circle at 38% 30%, #fff7a2 0 12%, transparent 13%),
+    linear-gradient(145deg, #fff36d 0 24%, #fdd835 25% 62%, #e7a800 63% 100%);
+  filter: drop-shadow(0 1px 0 #ca8e00);
 }
 
 .final-board {
@@ -5001,7 +5015,7 @@ body:has(.final-mission-stage) .interaction-host-area {
   top: clamp(12px, 2.8vh, 26px);
   left: 50%;
   z-index: 5;
-  width: min(900px, 76%);
+  width: min(820px, 72%);
   text-align: center;
   transform: translateX(-50%);
 }
@@ -5058,8 +5072,9 @@ body:has(.final-mission-stage) .interaction-host-area {
 }
 
 .final-simran {
-  left: 4%;
-  bottom: -24px;
+  /* Nudged left (was 4%) so Avi's thumb/arm clears the heading subtitle. */
+  left: -2%;
+  bottom: 0;
   width: clamp(190px, 22vw, 340px);
 }
 
@@ -5082,7 +5097,7 @@ body:has(.final-mission-stage) .interaction-host-area {
   bottom: clamp(76px, 10vh, 104px);
   left: 3%;
   z-index: 8;
-  padding: clamp(28px, 3.4vh, 38px) 12px 18px;
+  padding: clamp(28px, 3.4vh, 38px) 12px 16px;
   border: 1px solid rgba(199, 220, 241, 0.96);
   border-radius: 32px;
   background: rgba(255, 255, 255, 0.94);
@@ -5111,7 +5126,7 @@ body:has(.final-mission-stage) .interaction-host-area {
 
 .final-clue-card {
   min-width: 0;
-  padding: 0 clamp(14px, 2.2vw, 32px);
+  padding: 0 8px;
   border-right: 1px solid #e2e8f0;
   color: #18366f;
   text-align: center;
@@ -5123,9 +5138,9 @@ body:has(.final-mission-stage) .interaction-host-area {
 
 .final-clue-card img {
   display: block;
-  width: clamp(56px, 5.6vw, 88px);
-  height: clamp(50px, 5vw, 80px);
-  margin: 0 auto 6px;
+  width: clamp(54px, 6vw, 88px);
+  height: clamp(48px, 5.4vw, 80px);
+  margin: 0 auto 4px;
   object-fit: contain;
 }
 
@@ -5151,8 +5166,7 @@ body:has(.final-mission-stage) .interaction-host-area {
 }
 
 .final-clue-card span {
-  max-width: 260px;
-  margin: 10px auto 0;
+  margin-top: 5px;
   font-size: clamp(0.875rem, 0.98vw, 0.94rem);
   font-weight: 800;
   line-height: 1.22;
@@ -5239,8 +5253,8 @@ body:has(.final-mission-stage) .interaction-host-area {
 
 /* Flat palette override for Activity 1 shell */
 :root {
-  --fear-trigger-btn-top: #9b7ef0;
-  --fear-trigger-btn-bottom: #7d5dd9;
+  --fear-trigger-btn-top: #8A76E8;
+  --fear-trigger-btn-bottom: #6e5eba;
   --fear-trigger-btn-disabled: #a89ed8;
   --fear-trigger-lock: #f4c44e;
   --fear-trigger-lock-dark: #c28d1f;
@@ -5675,10 +5689,10 @@ body:has(.ft-complete) .check-btn-wrap.fear-complete-actions {
 body:has(.ft-complete) .check-btn-wrap.fear-complete-actions .btn {
   width: 100%;
   height: clamp(48px, 6.2vh, 62px);
-  border-color: #167ad7;
-  background: linear-gradient(180deg, #4dc6ff 0%, #1589eb 100%);
+  border-color: #6e5eba;
+  background: #8A76E8;
   color: #fbfcff;
-  box-shadow: inset 0 -5px 0 #0e66c5, 0 6px 0 rgba(21, 84, 171, 0.22);
+  box-shadow: inset 0 -5px 0 #6e5eba, 0 6px 0 rgba(138, 118, 232, 0.22);
   white-space: nowrap;
 }
 
@@ -5745,6 +5759,12 @@ body:has(.classify-grid) .section-eyebrow {
   color: var(--fear-trigger-accent-blue);
 }
 
+/* Safety Coach label: consistent navy on every screen (overrides the
+   cascade above via the #coachCard id). */
+#coachCard .section-eyebrow {
+  color: #1a2a6c;
+}
+
 body:has(.sort-stage) .sort-mission-banner,
 body:has(.classify-grid) .mobile-mission-banner {
   border: 1px solid var(--fear-trigger-header-dark);
@@ -5754,7 +5774,23 @@ body:has(.classify-grid) .mobile-mission-banner {
 
 body:has(.sort-stage) .sort-mission-banner em,
 body:has(.classify-grid) .mobile-mission-banner em {
-  color: var(--fear-trigger-counter-pink);
+  color: #ffc62a;
+}
+
+/* Gold accent on the last word of titles set on DARK backgrounds
+   (bright star-gold, like the last screen). */
+.final-spotted-ribbon em {
+  color: #ffc62a;
+  font-style: normal;
+}
+
+/* Left-panel titles keep their original navy color (no gold accent). The <em>
+   stays for markup consistency but inherits the title color and isn't italic. */
+.question-label em,
+.expression em {
+  color: inherit;
+  font-family: inherit;
+  font-style: normal;
 }
 
 body:has(.sort-stage) .sort-mission-icon {
@@ -5825,7 +5861,7 @@ body:has(.classify-grid) .footer-buttons .btn {
   padding: 12px 36px !important;
   border-radius: 50px !important;
   border: none !important;
-  background: #5548c9 !important;
+  background: #8A76E8 !important;
   color: #ffffff !important;
   font-family: 'Nunito', sans-serif !important;
   font-size: clamp(1.1rem, 1.7vw, 1.7rem) !important;
@@ -5837,7 +5873,7 @@ body:has(.classify-grid) .footer-buttons .btn {
   align-items: center !important;
   justify-content: center !important;
   transition: all 0.2s ease !important;
-  box-shadow: inset 0 -4px 0 rgba(0, 0, 0, 0.15), 0 4px 8px rgba(85, 72, 201, 0.3) !important;
+  box-shadow: inset 0 -4px 0 rgba(0, 0, 0, 0.15), 0 4px 8px rgba(138, 118, 232, 0.3) !important;
 }
 
 /* ============================================================
@@ -6068,8 +6104,8 @@ body:has(.classify-grid-empty) .check-btn-wrap.fear-complete-actions .btn {
   font-size: clamp(1.1rem, 1.7vw, 1.7rem) !important;
   /* Match the other game buttons: solid purple, no blue gradient. */
   border: none !important;
-  background: #5548c9 !important;
-  box-shadow: inset 0 -4px 0 rgba(0, 0, 0, 0.15), 0 4px 8px rgba(85, 72, 201, 0.3) !important;
+  background: #8A76E8 !important;
+  box-shadow: inset 0 -4px 0 rgba(0, 0, 0, 0.15), 0 4px 8px rgba(138, 118, 232, 0.3) !important;
 }
 
 /* ============================================================
@@ -6153,37 +6189,46 @@ body:has(.classify-grid-empty) .check-btn-wrap.fear-complete-actions .btn {
 }
 
 /* ============================================================================
-   FINALE BACKGROUND — keep the game's purple-winter scene (sorting-background.webp)
-   across the whole Mission Complete screen instead of the blue takeover. The
-   Activity 4 layout (side panel + board, pill ribbon, clue cards) is preserved;
-   only the backdrop is swapped so it matches the rest of the game.
+   FINALE BACKGROUND — implemented exactly from Activity 4: lavender-gradient
+   stage / app-container / right-panel, soft radial host glow, the purple board
+   scene (background.webp), a lavender box, and a transparent side panel.
+   Background only — element positions are untouched.
    ============================================================================ */
-body:has(.final-mission-stage),
+body:has(.final-mission-stage) {
+  background: #b8abf6;
+}
+
 body:has(.final-mission-stage) .app-container {
-  background: url('./assets/images/sorting-background.webp') center / cover no-repeat;
+  background: linear-gradient(180deg, #b8abf6 0%, #aa9bf2 100%);
 }
 
 .final-mission-stage {
-  background: transparent;
-  border: 0;
+  background: linear-gradient(180deg, #b8abf6 0%, #aa9bf2 100%);
+  border: 1px solid #a48cff;
 }
 
-body:has(.final-mission-stage) .right-panel,
-body:has(.final-mission-stage) .interaction-host-area,
+body:has(.final-mission-stage) .right-panel {
+  background: linear-gradient(180deg, #b8abf6 0%, #aa9bf2 100%);
+}
+
+body:has(.final-mission-stage) .interaction-host-area {
+  background: radial-gradient(circle at 51% 32%, rgba(247, 244, 255, 0.9), rgba(220, 207, 255, 0.46) 36%, rgba(169, 188, 255, 0.28) 100%);
+}
+
 body:has(.final-mission-stage) .final-board {
-  background: transparent;
+  background: url('./assets/images/background.webp') center / cover no-repeat;
 }
 
+/* Light blue box behind the white "What you learned" panel: top starts around
+   the panel's middle, bottom ends at the board bottom (taller than the base 25%). */
 body:has(.final-mission-stage) .final-board::after {
-  display: none;
+  display: block;
+  height: 33%;
+  background: rgba(199, 235, 255, 0.95);
 }
 
-/* Restore a distinct left sidebar panel (the transparent backdrop above removed
-   its frame). Lavender panel, like Activity 4, holding the white cards + motto. */
 body:has(.final-mission-stage) .final-side-panel {
-  background: linear-gradient(180deg, #b8abf6, #aa9bf2);
-  border-radius: 18px;
-  padding: clamp(12px, 1.6vw, 18px) clamp(10px, 1vw, 14px);
+  background: transparent;
 }
 
 /* Cyber-fraud note now sits inside the "What you learned" panel (Activity 4 has

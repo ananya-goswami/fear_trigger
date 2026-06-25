@@ -157,6 +157,15 @@ function escapeHtml(value) {
     .replace(/'/g, '&#039;');
 }
 
+// Wrap the last word of a title in <em> so it picks up the gold title accent.
+// Works for any language (just splits on the final space). Returns escaped HTML.
+function accentLastWord(value) {
+  const text = String(value).trim();
+  const i = text.lastIndexOf(' ');
+  if (i === -1) return `<em>${escapeHtml(text)}</em>`;
+  return `${escapeHtml(text.slice(0, i))} <em>${escapeHtml(text.slice(i + 1))}</em>`;
+}
+
 function getSceneActivityIndices(scene = scenes[state.sceneIndex]) {
   return scene.activityIndices || [scene.activityIndex];
 }
@@ -291,11 +300,12 @@ function showToast(message) {
   state.toastTimer = window.setTimeout(() => ui.toast.classList.remove('show'), 1800);
 }
 
-function playSfx(kind, options = {}) {
-  const { force = false } = options;
-  if (state.muted && !force) return Promise.resolve(false);
+function playSfx(kind) {
   const sound = sfx[kind];
   if (!sound) return Promise.resolve(false);
+  // Mute = play at volume 0 (not skipped), so timing stays identical to unmuted.
+  // The mute button's own 'click' stays audible both turning sound on AND off.
+  sound.muted = kind === 'click' ? false : state.muted;
   sound.pause();
   sound.currentTime = 0;
   sound.playbackRate = NATURAL_RATE_SFX.has(kind) ? 1 : AUDIO_PLAYBACK_RATE;
@@ -305,15 +315,13 @@ function playSfx(kind, options = {}) {
 }
 
 function playSfxThrough(kind, onDone) {
-  if (state.muted) {
-    onDone();
-    return;
-  }
   const sound = sfx[kind];
   if (!sound) {
     onDone();
     return;
   }
+  // Play at volume 0 when muted; onended/onerror still advance the flow.
+  sound.muted = state.muted;
   sound.pause();
   sound.currentTime = 0;
   sound.playbackRate = NATURAL_RATE_SFX.has(kind) ? 1 : AUDIO_PLAYBACK_RATE;
@@ -373,6 +381,22 @@ let currentVoiceOnEnded = null;
 let currentVoiceFallbackMs = 0;
 let voiceFallbackTimer = null;
 
+// Muting sets every audio element to volume 0 (native .muted) WITHOUT pausing,
+// so clips keep playing and unmuting restores the prior volume in place.
+// Dynamic clips (playAudioSequence) call applyAudioMute on creation.
+function applyAudioMute(audio) {
+  if (audio) audio.muted = state.muted;
+}
+
+function applyAudioMuteAll() {
+  // Skip 'click' — the mute button's feedback is always audible.
+  Object.entries(sfx).forEach(([kind, audio]) => {
+    if (kind !== 'click') applyAudioMute(audio);
+  });
+  applyAudioMute(screenVoice);
+  applyAudioMute(activeAudio);
+}
+
 // Play a screen's voiceover, interrupting whatever is playing. Remembers the
 // path (so unmuting replays the current line) and an optional onEnded callback
 // (e.g. reveal the Screen-3 boxes + enable Check). onEnded fires when the clip
@@ -387,19 +411,21 @@ function playScreenVoice(path, onEnded, fallbackMs) {
   screenVoice.pause();
   screenVoice.onended = null;
   window.clearTimeout(voiceFallbackTimer);
-  if (state.muted) {
+  const abs = new URL(currentVoicePath, document.baseURI).href;
+  if (screenVoice.src !== abs) screenVoice.src = currentVoicePath;
+  // Play at volume 0 when muted (don't skip) so the real onended drives the flow.
+  screenVoice.muted = state.muted;
+  screenVoice.currentTime = 0;
+  screenVoice.playbackRate = 1;
+  if (currentVoiceOnEnded) screenVoice.onended = currentVoiceOnEnded;
+  screenVoice.play().catch(() => {
+    // Autoplay blocked or load error: fall back to the timed advance so the
+    // flow never stalls.
     if (currentVoiceOnEnded) {
       if (currentVoiceFallbackMs) voiceFallbackTimer = window.setTimeout(currentVoiceOnEnded, currentVoiceFallbackMs);
       else currentVoiceOnEnded();
     }
-    return;
-  }
-  const abs = new URL(currentVoicePath, document.baseURI).href;
-  if (screenVoice.src !== abs) screenVoice.src = currentVoicePath;
-  screenVoice.currentTime = 0;
-  screenVoice.playbackRate = 1;
-  if (currentVoiceOnEnded) screenVoice.onended = currentVoiceOnEnded;
-  screenVoice.play().catch(() => {});
+  });
 }
 
 // First-screen voice prompt (behavior ported from the bubble-burst game): the
@@ -667,6 +693,7 @@ function playAudioSequence(sources, onDone) {
     }
 
     const audio = new Audio(sources[index]);
+    audio.muted = state.muted;
     audio.playbackRate = AUDIO_PLAYBACK_RATE;
     index += 1;
     activeAudio = audio;
@@ -679,11 +706,6 @@ function playAudioSequence(sources, onDone) {
 }
 
 function speakLine(text, who, onDone) {
-  if (state.muted) {
-    window.setTimeout(onDone, 650);
-    return;
-  }
-
   cancelVoice();
   const audioSequence = getPreRecordedAudioSequence(text);
   if (audioSequence.length) {
@@ -1639,7 +1661,7 @@ function renderInfoPageActivity(activity) {
       <div class="activity-panel">
         <header class="mobile-mission-banner">
           <span class="mission-bubble" aria-hidden="true"></span>
-          <div><strong>${escapeHtml(activity.title)}</strong><small>${escapeHtml(activity.instruction)}</small></div>
+          <div><strong>${accentLastWord(activity.title)}</strong><small>${escapeHtml(activity.instruction)}</small></div>
         </header>
         <div class="mobile-screen-progress">
           <strong>Screen ${state.step}/${total}</strong>
@@ -1700,7 +1722,7 @@ function renderInboxScreen() {
       <div class="activity-panel">
         <header class="mobile-mission-banner mobile-mission-banner--compact">
           <span class="mission-bubble" aria-hidden="true"></span>
-          <div><strong>Choose the Message</strong></div>
+          <div><strong>Choose the <em>Message</em></strong></div>
         </header>
         <div class="mobile-screen-progress">
           <strong>Screen ${state.step}/${total}</strong>
@@ -1782,7 +1804,7 @@ function renderSelectScreen() {
       <div class="activity-panel">
         <header class="mobile-mission-banner mobile-mission-banner--compact">
           <span class="mission-bubble" aria-hidden="true"></span>
-          <div><strong>Box the Fear Triggers</strong></div>
+          <div><strong>Box the Fear <em>Triggers</em></strong></div>
         </header>
         <div class="mobile-screen-progress">
           <strong>Screen ${state.step}/${total}</strong>
@@ -1849,7 +1871,7 @@ function renderSmsPhoneScreen(title, bubbleClass, total) {
       <div class="activity-panel">
         <header class="mobile-mission-banner mobile-mission-banner--compact">
           <span class="mission-bubble" aria-hidden="true"></span>
-          <div><strong>${escapeHtml(title)}</strong></div>
+          <div><strong>${accentLastWord(title)}</strong></div>
         </header>
         <div class="mobile-screen-progress">
           <strong>Screen ${state.step}/${total}</strong>
@@ -2042,7 +2064,7 @@ function renderCompleteScreen() {
           <img class="final-scam-trash" src="./assets/images/sorting-final-icons/clipboard.webp" alt="Scam messages stopped">
         </div>
         <section class="final-spotted-panel">
-          <strong class="final-spotted-ribbon">Here&rsquo;s What You Learned:</strong>
+          <strong class="final-spotted-ribbon">Here&rsquo;s What You <em>Learned:</em></strong>
           <div class="final-spotted-grid">
             ${learned.map((item) => `
               <article class="final-clue-card">
@@ -2052,7 +2074,6 @@ function renderCompleteScreen() {
               </article>
             `).join('')}
           </div>
-          <p class="final-spotted-note">Report Cyber Fraud in India at <strong>cybercrime.gov.in</strong> or call <strong>1930</strong>.</p>
         </section>
         <button class="final-play-again" type="button">&#8635; <span>Play Again</span></button>
       </main>
@@ -2168,7 +2189,7 @@ function renderClassifyActivity(activity) {
       <div class="activity-panel ${state.reaction}">
         <header class="mobile-mission-banner">
           <span class="mission-bubble" aria-hidden="true"></span>
-          <div><strong>${escapeHtml(activity.title)}</strong><small>${escapeHtml(activity.instruction)}</small></div>
+          <div><strong>${accentLastWord(activity.title)}</strong><small>${escapeHtml(activity.instruction)}</small></div>
         </header>
         <div class="mobile-screen-progress">
           <strong>Screen ${answeredCount}/${activity.items.length}</strong>
@@ -2238,8 +2259,8 @@ function updateChrome() {
   const isMythFact = state.phase === 'activity' && activity.type === 'mythFact';
   document.title = t('appTitle');
   document.documentElement.lang = currentLanguage;
-  if (ui.moduleLabel) ui.moduleLabel.textContent = t('moduleLabel');
-  ui.title.textContent = isMythFact ? t('mythTitle') : state.phase === 'activity' ? activity.title : t('title');
+  if (ui.moduleLabel) ui.moduleLabel.innerHTML = accentLastWord(t('moduleLabel'));
+  ui.title.innerHTML = accentLastWord(isMythFact ? t('mythTitle') : state.phase === 'activity' ? activity.title : t('title'));
   ui.subtitle.textContent = state.phase === 'intro'
     ? t('subtitle')
     : isMythFact
@@ -2410,7 +2431,7 @@ function renderGame() {
           <img class="final-scam-trash" src="./assets/images/sorting-final-icons/clipboard.webp" alt="Scam messages stopped">
         </div>
         <section class="final-spotted-panel">
-          <strong class="final-spotted-ribbon">Here&rsquo;s What You Learned:</strong>
+          <strong class="final-spotted-ribbon">Here&rsquo;s What You <em>Learned:</em></strong>
           <div class="final-spotted-grid">
             ${learnedCards.map(([icon, title, verdict, detail]) => `
               <article class="final-clue-card">
@@ -2422,10 +2443,6 @@ function renderGame() {
             `).join('')}
           </div>
         </section>
-        <div class="final-report-section">
-          <p class="report-heading">Report Cyber Fraud in India</p>
-          <p class="report-details">Visit <strong>cybercrime.gov.in</strong> or call <strong>1930</strong></p>
-        </div>
         <button class="final-play-again" type="button">&#8635; <span>${escapeHtml(t('playAgain'))}</span></button>
       </main>
     </section>
@@ -2561,17 +2578,11 @@ function syncFullscreenState() {
 
 function setupControls() {
   ui.muteBtn.addEventListener('click', () => {
-    const nextMuted = !state.muted;
-    playSfx('click', { force: true });
-    state.muted = nextMuted;
-    if (state.muted) {
-      cancelVoice();
-      screenVoice.pause();
-      sfx.firstPageInstruction.pause();
-    } else {
-      // Turning sound ON: play the current screen's voiceover.
-      playScreenVoice();
-    }
+    // Mute = drop every clip to volume 0 in place (keep playing); unmute =
+    // restore the prior volume. No pausing or restarting.
+    state.muted = !state.muted;
+    applyAudioMuteAll();
+    playSfx('click');
     syncMuteIconState();
   });
   document.getElementById('resetGameBtn').addEventListener('click', restartGame);

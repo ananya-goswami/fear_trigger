@@ -337,6 +337,42 @@ function setIntroChoiceHighlight(which) {
   if (scam) scam.classList.toggle('intro-highlight', which === 'scam');
 }
 
+let startupGateRelease = null;
+
+function clearStartupGateListeners() {
+  if (!startupGateRelease) return;
+  startupGateRelease();
+  startupGateRelease = null;
+}
+
+function hideStartupGate() {
+  clearStartupGateListeners();
+  document.body.classList.remove('startup-gate-active');
+  ui.loader?.classList.add('hidden');
+}
+
+function activateStartupGate(onOpen) {
+  if (!ui.loader) {
+    onOpen?.();
+    return;
+  }
+  clearStartupGateListeners();
+  ui.loader.classList.remove('hidden');
+  document.body.classList.add('startup-gate-active');
+  const openGate = (event) => {
+    if (event.type === 'keydown' && !['Enter', ' ', 'Spacebar'].includes(event.key)) return;
+    event.preventDefault?.();
+    hideStartupGate();
+    onOpen?.();
+  };
+  ui.loader.addEventListener('pointerdown', openGate, { once: true });
+  document.addEventListener('keydown', openGate);
+  startupGateRelease = () => {
+    ui.loader.removeEventListener('pointerdown', openGate);
+    document.removeEventListener('keydown', openGate);
+  };
+}
+
 function playFirstPageInstruction() {
   // Hold the first-screen voiceover until the user clicks the yellow voice-prompt
   // bubble (matches the bubble-burst). The click-to-activate handler then plays it
@@ -2570,6 +2606,9 @@ function syncFullscreenState() {
   const exitIcon = btn.querySelector('.fullscreen-exit-icon');
   const active = Boolean(document.fullscreenElement);
   btn.classList.toggle('is-fullscreen', active);
+  // Drive the fullscreen-only layout overrides (see game.css "is-browser-fullscreen"
+  // block). Windowed has no class, so the windowed layout stays exactly as-is.
+  document.body.classList.toggle('is-browser-fullscreen', active);
   btn.title = active ? t('exitFullscreen') : t('enterFullscreen');
   btn.setAttribute('aria-label', active ? t('exitFullscreen') : t('enterFullscreen'));
   if (enterIcon) enterIcon.style.display = active ? 'none' : 'block';
@@ -2603,14 +2642,15 @@ async function initialize() {
     currentLanguage = savedLanguage;
   }
   sfx.firstPageInstruction.load();
-  playFirstPageInstruction();
   await loadLocaleContent();
   buildProgressDots();
   updateGameWithCircles();
   setupControls();
   setupLanguageSwitcher();
   renderGame();
-  window.setTimeout(() => ui.loader.classList.add('hidden'), 250);
+  activateStartupGate(() => {
+    playFirstPageInstruction();
+  });
 }
 
 window.addEventListener('beforeunload', cancelVoice);

@@ -3767,7 +3767,6 @@ body:has(.classify-grid) .top-bar {
 body:has(.classify-grid) .progress-container,
 body:has(.classify-grid) #resetGameBtn,
 body:has(.classify-grid) #openTutorialBtn,
-body:has(.classify-grid) #fullscreenBtn,
 body:has(.classify-grid) #langBtn {
   display: none;
 }
@@ -3776,8 +3775,13 @@ body:has(.classify-grid) .top-icons {
   gap: 14px;
 }
 
+/* Mute first, fullscreen second; both share the flat (no drop-shadow) look. */
 body:has(.classify-grid) #muteBtn {
   order: -1;
+}
+
+body:has(.classify-grid) #muteBtn,
+body:has(.classify-grid) #fullscreenBtn {
   box-shadow: none;
 }
 
@@ -4742,7 +4746,6 @@ body:has(.final-mission-stage) .progress-container,
 body:has(.final-mission-stage) #resetGameBtn,
 body:has(.final-mission-stage) #openTutorialBtn,
 body:has(.final-mission-stage) #langBtn,
-body:has(.final-mission-stage) #fullscreenBtn,
 body:has(.final-mission-stage) .check-btn-wrap {
   display: none;
 }
@@ -4773,6 +4776,7 @@ body:has(.final-mission-stage) .icon-circle {
 }
 
 body:has(.final-mission-stage) #muteBtn,
+body:has(.final-mission-stage) #fullscreenBtn,
 body:has(.final-mission-stage) #langBtn {
   border-width: 2px;
 }
@@ -6219,11 +6223,15 @@ body:has(.final-mission-stage) .final-board {
   background: url('./assets/images/background.webp') center / cover no-repeat;
 }
 
-/* Light blue box behind the white "What you learned" panel: top starts around
-   the panel's middle, bottom ends at the board bottom (taller than the base 25%). */
+/* Light blue box behind the white "What you learned" panel. Anchored to the SAME
+   reference as the panel (its bottom = clamp(76px,10vh,104px) from the board
+   bottom) plus a fixed 90px, so the band's top always sits ~midway up the panel
+   regardless of viewport height — identical in windowed and fullscreen. (The old
+   `height: 33%` was a fraction of the whole board, so it drifted to 88%-130% up
+   the panel as the screen got taller.) */
 body:has(.final-mission-stage) .final-board::after {
   display: block;
-  height: 33%;
+  height: calc(clamp(76px, 10vh, 104px) + 90px);
   background: rgba(199, 235, 255, 0.95);
 }
 
@@ -6244,4 +6252,86 @@ body:has(.final-mission-stage) .final-side-panel {
 
 .final-spotted-note strong {
   color: #5b3fb8;
+}
+
+/* ============================================================================
+   BROWSER-FULLSCREEN LAYOUT OVERRIDES
+   ----------------------------------------------------------------------------
+   index.js adds `is-browser-fullscreen` to <body> only while the browser is in
+   real fullscreen (document.fullscreenElement). Windowed has NO such class, so
+   the windowed layout (the design reference) is left 100% untouched.
+
+   In fullscreen the viewport is ~18% taller. Without help, the gameplay
+   (.classify-grid) left panel let `.tej-guide` flex-grow eat the extra height,
+   which dropped Avi ~90px below the speech bubble (a big empty gap) while the
+   cards stayed the same size. These rules scale the left-panel content up so it
+   fills the taller column and keeps Avi tucked under the speech bubble, matching
+   the windowed look. The right-panel phone already scales with 95vh, and the
+   .final-mission-stage end screen already scales — neither needs changes.
+   ============================================================================ */
+
+/* Title card a touch larger so it carries more vertical weight. */
+body.is-browser-fullscreen:has(.classify-grid) .question-card {
+  padding: clamp(18px, 3vh, 32px) 10px;
+}
+body.is-browser-fullscreen:has(.classify-grid) .question-label {
+  font-size: clamp(1.7rem, 2.7vw, 2.6rem);
+}
+
+/* Avi grows modestly with the taller column so his head stays tucked under the
+   speech bubble (same snug overlap as windowed) instead of dropping away.
+   Also nudged a little further left (base classify is -22px) per request — only
+   on these gameplay screens, not the .final-mission-stage end screen. */
+body.is-browser-fullscreen:has(.classify-grid) .tej-guide-image {
+  width: clamp(240px, min(18.5vw, 38vh), 300px);
+  left: -42px;
+}
+/* Nudge the speech bubble down just slightly (not enough to clear Avi's head). */
+body.is-browser-fullscreen:has(.classify-grid) .tej-speech {
+  top: clamp(30px, 4vh, 44px);
+  width: 60%;
+  padding: 13px 10px;
+  font-size: clamp(0.92rem, 1vw, 1.08rem);
+}
+
+/* Safety Coach: bigger eyebrow, rows, icons and padding to fill the height. */
+body.is-browser-fullscreen:has(.classify-grid) .section-eyebrow {
+  padding: 12px 14px;
+  font-size: clamp(1.12rem, 1.45vw, 1.46rem);
+}
+body.is-browser-fullscreen:has(.classify-grid) .safety-coach-list {
+  gap: clamp(11px, 1.9vh, 17px) 11px;
+  padding: clamp(13px, 2.1vh, 20px) 14px;
+  font-size: clamp(0.98rem, 1.08vw, 1.14rem);
+}
+body.is-browser-fullscreen:has(.classify-grid) .coach-icon {
+  width: 45px;
+  height: 45px;
+}
+
+/* Motto bar a little taller / larger to match. */
+body.is-browser-fullscreen:has(.classify-grid) .sidebar-motto {
+  padding: clamp(13px, 2.1vh, 20px) 10px;
+  font-size: clamp(1rem, 1.2vw, 1.2rem);
+}
+
+/* End screen (.final-mission-stage): the hero row is top-anchored with capped
+   vh heights, so on a tall fullscreen board it tops out while the white
+   "What You Learned" panel keeps descending — Avi and the folder end up floating
+   well above it (gap grows 22px -> 71px -> 177px as the screen gets taller).
+   Bottom-anchor the hero row so the cluster tracks the panel and settles onto it,
+   matching the windowed look. The `+205px` keeps the images ~20px above the
+   panel top (same small overlap as windowed). Windowed has no class, so it stays
+   top-anchored as before. */
+body.is-browser-fullscreen:has(.final-mission-stage) .final-hero-row {
+  top: auto;
+  bottom: calc(clamp(76px, 10vh, 104px) + 205px);
+}
+
+/* Drop ONLY Avi + the basket so their bottoms tuck a little BEHIND the white
+   box's top edge (they read as standing behind it). The shield stays floating in
+   the centre — not moved. */
+body.is-browser-fullscreen:has(.final-mission-stage) .final-simran,
+body.is-browser-fullscreen:has(.final-mission-stage) .final-scam-trash {
+  bottom: -56px;
 }

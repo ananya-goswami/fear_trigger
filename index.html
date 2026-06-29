@@ -6,13 +6,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Scam or Not?</title>
   <link rel="icon" type="image/webp" href="./assets/images/logo.webp" />
-  <link rel="stylesheet" href="index.css?v=20260624-score-fix" />
-  <link rel="stylesheet" href="game.css?v=20260624-score-fix" />
+  <link rel="stylesheet" href="index.css?v=20260629-fs5" />
+  <link rel="stylesheet" href="game.css?v=20260629-fs5" />
 </head>
 
 <body>
-  <div id="loader-overlay" class="loader-overlay">
-    <img src="./assets/images/loader.webp" alt="Loading..." />
+  <div id="loader-overlay" class="loader-overlay" role="button" tabindex="0" aria-label="Tap to open the game">
+    <div class="loader-overlay-card">
+      <img src="./assets/images/loader.gif" alt="Loading..." />
+      <p class="loader-overlay-text">Tap to Open</p>
+    </div>
   </div>
 
   <div class="portrait-mode-blocker">
@@ -219,7 +222,7 @@
 
   <div id="toast" class="quest-toast" aria-live="polite"></div>
 
-  <script type="module" src="index.js?v=20260624-score-fix"></script>
+  <script type="module" src="index.js?v=20260629-fs5"></script>
 </body>
 
 </html>
